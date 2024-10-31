@@ -1,0 +1,34 @@
+﻿ @{
+    ViewData["Title"] = "Home Page";
+}
+@*
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div> *@
+
+@model IEnumerable<WebWellsMVC.WellDb.DbModels.Wells>
+
+<h2>Список скважин</h2>
+<p><a asp-action="Create">Добавить скважину</a></p>
+<table class="table">
+    <tr><th>Имя скважины</th><th>Куст</th><th>Тип скважины</th><th>Способ эксплуатации</th><th>Этап</th></tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Bush</td>
+            <td>@item.Type</td>
+            <td>@item.OpMethod</td>
+            <td>@item.Stage</td>
+            <td>
+                <a asp-action="Edit" asp-controller="Home" asp-route-id="@item.UWI">Изменить</a>
+            </td>
+            <td>
+                <form asp-controller="Home" asp-action="Delete" method="post" asp-route-id="@item.UWI">
+                    <input type="submit" value="Удалить" />
+                </form>
+            </td>
+        </tr>
+    }
+</table>

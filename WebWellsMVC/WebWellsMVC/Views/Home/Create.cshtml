@@ -1,0 +1,52 @@
+﻿@* @page
+@model WebWellsMVC.Views.Home.CreateModel
+@{
+} *@
+@model WebWellsMVC.WellDb.DbModels.Wells
+ 
+<h2>Добавление скважины</h2>
+<form asp-action="create" asp-controller="home">
+    <p>
+        <label asp-for="Name">Имя скважины</label><br />
+        <input type="text" asp-for="Name" />
+    </p>
+    <p>
+        <label asp-for="Bush">Куст</label><br />
+        <input type="text" asp-for="Bush" />
+    </p>
+    <p>
+        <label asp-for="Type">Тип скважины</label><br />
+        <select name="Type">
+            <option value="газовая">газовая</option>
+            <option value="газоконденсатная">газоконденсатная</option>
+            <option value="нефтяная">нефтяная</option>
+            <option value="разведочная">разведочная</option>
+            <option value="поисковая">поисковая</option>
+            <option value="поглощающая">поглощающая</option>
+            <option value="нагнетательная">нагнетательная</option>
+            <option value="пьезометрическая">пьезометрическая</option>
+
+        </select>
+        @* <input type="text" asp-for="Type" /> *@
+    </p>
+    <p>
+        <label asp-for="OpMethod">Способ эксплуатации</label><br />
+        <select name="OpMethod">
+            <option value="фонтанный">фонтанный</option>
+            <option value="механизированный">механизированный</option>
+        </select>
+        @* <input type="text" asp-for="OpMethod" /> *@
+    </p>
+    <p>
+        <label asp-for="Stage">Этап</label><br />
+        <select name="Stage">
+            <option value="эксплуатация">эксплуатация</option>
+            <option value="консервация">консервация</option>
+            <option value="ликвидация">ликвидация</option>
+        </select>
+@*         <input type="text" asp-for="Stage" />*@ 
+    </p>
+    <p>
+        <input type="submit" value="Добавить" />
+    </p>
+</form>

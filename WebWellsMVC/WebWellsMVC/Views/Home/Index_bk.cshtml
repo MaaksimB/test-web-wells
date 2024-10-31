@@ -1,0 +1,218 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@* <div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div> *@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        td {
+            padding: 5px;
+        }
+
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Список скважин</h2>
+    <div>
+        <input type="hidden" id="wellUWI" />
+        <p>
+            Наименование:<br />
+            <input id="Name" />
+        </p>
+        <p>
+            Куст:<br />
+            <input id="Bush"  />
+        </p>
+        <p>
+            <button id="saveBtn">Сохранить</button>
+            <button id="resetBtn">Сбросить</button>
+        </p>
+    </div>
+    <table>
+        <thead><tr><th>Наименование</th><th>Куст</th><th></th></tr></thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+    // Получение всех скважин
+        async function getWells() {
+            // отправляет запрос и получаем ответ
+            const response = await fetch("/api/wells", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            // если запрос прошел нормально
+            if (response.ok === true) {
+                // получаем данные
+                const wells = await response.json();
+                const rows = document.querySelector("tbody");
+                // добавляем полученные элементы в таблицу
+                wells.forEach(well => rows.append(row(well)));
+            }
+        }
+        // Получение одной скважины
+        async function geWell(id) {
+            const response = await fetch(`/api/wells/${UWI}`, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const well = await response.json();
+                document.getElementById("UWI").value = well.UWI;
+                document.getElementById("Name").value = well.Name;
+                document.getElementById("Bush").value = well.Bush;
+            }
+            else {
+                // если произошла ошибка, получаем сообщение об ошибке
+                const error = await response.json();
+                console.log(error.message); // и выводим его на консоль
+            }
+        }
+        // Добавление скважины
+        async function createWell(Name, Bush, Type, OpMethod, Stage) {
+
+            const response = await fetch("api/wells", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    Name: Name,
+                    Bush: Bush,
+                    Type: Type,
+                    OpMethod: OpMethod,
+                    Stage: Stage
+                })
+            });
+            if (response.ok === true) {
+                const well = await response.json();
+                document.querySelector("tbody").append(row(well));
+            }
+            else {
+                const error = await response.json();
+                console.log(error.message);
+            }
+        }
+        // Изменение скважины
+        async function editWell(Name, Bush, Type, OpMethod, Stage) {
+            const response = await fetch("api/wells", {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    Bush: Bush,
+                    Type: Type,
+                    OpMethod: OpMethod,
+                    Stage: Stage
+                })
+            });
+            if (response.ok === true) {
+                const well = await response.json();
+                document.querySelector(`tr[data-rowid='${well.UWI}']`).replaceWith(row(well));
+            }
+            else {
+                const error = await response.json();
+                console.log(error.message);
+            }
+        }
+        // Удаление скважины
+        async function deleteWell(UWI) {
+            const response = await fetch(`/api/wells/${UWI}`, {
+                method: "DELETE",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const well = await response.json();
+                document.querySelector(`tr[data-rowid='${well.UWI}']`).remove();
+            }
+            else {
+                const error = await response.json();
+                console.log(error.message);
+            }
+        }
+
+        // сброс данных формы после отправки
+        function reset() {
+            document.getElementById("Name").value =
+            document.getElementById("Bush").value =
+            document.getElementById("Type").value = 
+            document.getElementById("OpMethod").value = 
+            document.getElementById("Stage").value = 
+        }
+        // создание строки для таблицы
+        function row(well) {
+
+            const tr = document.createElement("tr");
+            tr.setAttribute("data-rowid", well.UWI);
+
+            const nameTd = document.createElement("td");
+            nameTd.append(well.Name);
+            tr.append(nameTd);
+
+            const bushTd = document.createElement("td");
+            bushTd.append(well.Bush);
+            tr.append(bushTd);
+
+            const typeTd = document.createElement("td");
+            typeTd.append(well.Type);
+            tr.append(typeTd);
+
+            const opMethodTd = document.createElement("td");
+            opMethodTd.append(well.OpMethod);
+            tr.append(opMethodTd);
+
+            const stageTd = document.createElement("td");
+            stageTd.append(well.Stage);
+            tr.append(stageTd);
+
+
+            const linksTd = document.createElement("td");
+
+            const editLink = document.createElement("button");
+            editLink.append("Изменить");
+            editLink.addEventListener("click", async () => await getWell(well.UWI));
+            linksTd.append(editLink);
+
+            const removeLink = document.createElement("button");
+            removeLink.append("Удалить");
+            removeLink.addEventListener("click", async () => await deleteWell(well.UWI));
+
+            linksTd.append(removeLink);
+            tr.appendChild(linksTd);
+
+            return tr;
+        }
+        // сброс значений формы
+        document.getElementById("resetBtn").addEventListener("click", () =>  reset());
+
+        // отправка формы
+        document.getElementById("saveBtn").addEventListener("click", async () => {
+
+            const UWI = document.getElementById("wellUWI").value;
+            const Name = document.getElementById("wellName").value;
+            const Bush = document.getElementById("wellBush").value;
+            const Type = document.getElementById("wellType").value;
+            const OpMethod = document.getElementById("wellOpMethod").value;
+            const Stage = document.getElementById("wellStage").value;
+            if (id === "")
+                await createWell(Name, Bush, Type, OpMethod, Stage);
+            else
+                await editWell(UWI, Name, Bush, Type, OpMethod, Stage);
+            reset();
+        });
+
+        // загрузка скважин
+        getWells();
+    </script>
+</body>
+</html>
